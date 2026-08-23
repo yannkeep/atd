@@ -1,0 +1,119 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "title": "Repères documentaires sur ATD Quart Monde en Belgique",
+  "updated": "2026-08-24",
+  "language": "fr-BE",
+  "spatialCoverage": "Belgique",
+  "temporalCoverage": "2025-2026",
+  "methodNote": "Les données d'activité sont auto-déclarées dans le rapport moral 2025 d'ATD Quart Monde Belgique. Elles ne constituent ni une mesure exhaustive d'impact, ni une photographie permanente de 2026. Les données SILC 2025 proviennent de Statbel.",
+  "locations2025": {
+    "total": 20,
+    "definition": "Lieux où ATD Quart Monde déclarait être actif localement dans son rapport moral 2025 ; il ne s'agit pas de vingt antennes salariées identiques.",
+    "regions": [
+      {
+        "name": "Flandre",
+        "count": 10,
+        "places": ["Ostende", "Bruges", "Willebroek", "Turnhout", "Renaix", "Courtrai-Avelgem", "Brabant flamand", "Alost", "Gand", "Anvers"]
+      },
+      {
+        "name": "Bruxelles",
+        "count": 2,
+        "places": ["Molenbeek", "Etterbeek"]
+      },
+      {
+        "name": "Wallonie",
+        "count": 8,
+        "places": ["Tournai", "Quaregnon", "La Louvière-Centre", "Charleroi", "Sambreville", "Liège", "Verviers", "Beauraing-Pays des Vallées"]
+      }
+    ],
+    "currentnessNote": "Bruges figure dans la photographie 2025. La fin de l'activité du groupe local a été annoncée en juin 2026."
+  },
+  "organization": {
+    "legalEntities": 5,
+    "breakdown": {"associations": 4, "publicBenefitFoundation": 1},
+    "engagementRoles": ["militantes et militants Quart Monde", "volontaires permanentes et permanents", "alliées, alliés et amis"]
+  },
+  "activities2025": {
+    "donors": 2068,
+    "actionTeamReinforcements": {
+      "total": 16,
+      "paidImmersion": 7,
+      "volunteerDiscovery": 4,
+      "longStudyPlacements": 2,
+      "civicService": 2,
+      "erasmusPlus": 1
+    },
+    "awarenessSessions": {"minimum": 20, "qualifier": "plus de"},
+    "legalGroup": {"approximateMembers": 15, "meetingFrequency": "mensuelle"},
+    "politicalGroup": {"approximateMembers": 10},
+    "groupFamilyStays": 2
+  },
+  "finance2025": {
+    "currency": "EUR",
+    "scope": "Consolidation des cinq entités belges",
+    "incomeTotal": 2002860,
+    "expenseTotal": 2031533,
+    "result": -28673,
+    "combinedBalanceSheet": 3532126,
+    "income": [
+      {"category": "Subsides et subvention de France", "amount": 1238961, "sharePercent": 61.9},
+      {"category": "Dons", "amount": 466207, "sharePercent": 23.3},
+      {"category": "Legs", "amount": 165737, "sharePercent": 8.2},
+      {"category": "Autres produits et exceptionnels", "amount": 66820, "sharePercent": 3.3},
+      {"category": "Produits financiers", "amount": 36728, "sharePercent": 1.8},
+      {"category": "Récupérations de frais", "amount": 23246, "sharePercent": 1.2},
+      {"category": "Ventes de livres et cartes", "amount": 5161, "sharePercent": 0.3}
+    ],
+    "expenses": [
+      {"category": "Projets et activités, salaires inclus", "amount": 1542454, "sharePercent": 76.0},
+      {"category": "Administration générale, salaires inclus", "amount": 261985, "sharePercent": 12.9},
+      {"category": "Récolte de fonds, salaires inclus", "amount": 134979, "sharePercent": 6.6},
+      {"category": "Amortissements", "amount": 50961, "sharePercent": 2.5},
+      {"category": "Autres charges", "amount": 33918, "sharePercent": 1.7},
+      {"category": "Achats de livres et cartes", "amount": 4034, "sharePercent": 0.2},
+      {"category": "Charges financières", "amount": 3201, "sharePercent": 0.1}
+    ],
+    "auditNote": "Le rapport moral 2025 indique que les comptes des cinq entités ont été audités par un auditeur externe membre de l'Institut des Réviseurs d'Entreprises.",
+    "reconciliationNote": "Les montants publiés par catégorie de charges totalisent 2 031 532 EUR, soit un euro de moins que le total de 2 031 533 EUR affiché dans le même rapport. Les valeurs publiées sont conservées sans correction."
+  },
+  "belgiumSILC2025": {
+    "aropePercent": 16.5,
+    "people": "plus de 1,9 million",
+    "components": {
+      "monetaryPovertyRiskPercent": 10.9,
+      "lowWorkIntensityPercent": 11.0,
+      "severeMaterialAndSocialDeprivationPercent": 4.9
+    },
+    "nonAdditivityNote": "Les composantes se chevauchent et ne doivent pas être additionnées."
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "ATD Quart Monde Belgique - Rapport moral 2025",
+      "url": "https://atd-quartmonde.be/cms/wp-content/uploads/2026/05/rapport-moral-2025-fr-web.pdf",
+      "published": "2026-05-11"
+    },
+    {
+      "id": "S2",
+      "title": "Statbel - Plus de 1,9 million de Belges courent un risque de pauvreté ou d'exclusion sociale",
+      "url": "https://statbel.fgov.be/fr/nouvelles/plus-de-19-million-de-belges-courent-un-risque-de-pauvrete-ou-dexclusion-sociale",
+      "published": "2026-02-05"
+    },
+    {
+      "id": "S3",
+      "title": "ATD Quart Monde Belgique - Structure d'ATD Quart Monde en Belgique",
+      "url": "https://atd-quartmonde.be/qui-sommes-nous/structure-et-fonctionnement/structure-datd-quart-monde-en-belgique/"
+    },
+    {
+      "id": "S4",
+      "title": "Service de lutte contre la pauvreté - Participation, aperçu des réflexions du Service",
+      "url": "https://luttepauvrete.be/publications/10ansaccord/10ansaccord_02-3_participation_FR.pdf"
+    },
+    {
+      "id": "S5",
+      "title": "UNESCO - Archives of the International Movement ATD Fourth World",
+      "url": "https://www.unesco.org/en/memory-world/archives-international-movement-atd-fourth-world-france-and-burkina-faso-1957-1992"
+    }
+  ]
+}
