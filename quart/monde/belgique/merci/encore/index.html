@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATD Quart Monde Belgique - Plateforme Interactive d'Analyse et de Démocratie Épistémique</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fffbf5',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#9a3412',
+                            900: '#78350f',
+                        },
+                        tealbrand: {
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                        },
+                        sand: {
+                            50: '#fdfbf7',
+                            100: '#f7f4ed',
+                            200: '#e8e2d5',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .tab-btn.active {
+            border-bottom: 3px solid #9a3412;
+            color: #9a3412;
+            font-weight: 700;
+            background-color: #fef3c7;
+        }
+    </style>
+</head>
+<body class="bg-sand-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Dignité Warm Neutrals (Fond sable chaud #fdfbf7, texte ardoise #1e293b, accents terre cuite/ambre #9a3412 et bleu teal #0f766e) -->
+
+    <!-- Application Structure Plan:
+        L'application est structurée en 7 sections thématiques interactives accessibles via une barre de navigation fluide :
+        1. Vue d'ensemble & Genèse : Origines philosophiques (Wresinski), distinction Pauvreté vs Misère, et chronologie interactive (1956-2026).
+        2. Ingénierie & Gouvernance Belge : Tableau des 5 entités juridiques belges (ASBL, Fondation), structure financière et 3 piliers d'engagement.
+        3. Justice Épistémique & Croisement des Savoirs : Simulateur interactif de la méthodologie (Savoir Expérientiel, Académique, Pratique) et exemple de recherche sur l'Aide Alimentaire (UCLouvain).
+        4. Universités Populaires & Actions Jeunesse : Fonctionnement des UPQM, analyse de l'accord de coalition "Arizona" 2026, Bibliothèques de rue, Tapori et École inclusive.
+        5. Ancrage Territorial (Wallonie & Bruxelles) : Module interactif d'exploration des groupes locaux (La Louvière, Charleroi, Liège, Namur, Bruxelles/Molenbeek).
+        6. Plaidoyer & Combat Juridique : Simulateur macroéconomique TZCLD (Territoires Zéro Chômeur), Baromètre des coûts du Non-Recours (BELMOD), et recours 2026 contre le règlement anti-mendicité à Bruxelles.
+        7. Agir & S'engager : Guide interactif pour rejoindre le mouvement selon son profil (Militant, Volontaire permanent, Allié, Donateur).
+        Cette structure non-linéaire permet une lecture sur mesure tout en restituant l'ensemble de la complexité institutionnelle et humaine du rapport.
+    -->
+
+    <!-- Visualization & Content Choices:
+        - Chronologie historique (1956-2026) -> Jalons clés -> Timeline interactive JS -> Permet de parcourir les étapes de Noisy-le-Grand au Conseil d'État en 2026.
+        - Piliers d'engagement -> Proportions & rôles -> Donut Chart (Chart.js) -> Illustre l'équilibre entre Militants, Volontaires et Alliés.
+        - Croisement des Savoirs -> Triangulation cognitive -> Diagramme interactif HTML/CSS -> Explicite le choc des rationalités sans hiérarchie.
+        - Baromètre des Coûts du Non-recours -> Analyse multidimensionnelle -> Bar Chart horizontal (Chart.js) -> Compare les coûts d'Information, de Processus et Psychologiques.
+        - Simulateur TZCLD -> Réallocation budgétaire -> Range slider & Stacked Bar Chart (Chart.js) -> Démontre la conversion des dépenses passives en création de CDI.
+        - Cartographie Wallonie-Bruxelles -> Ancrage spatial -> Filtres interactifs par province -> Offre un accès direct aux spécificités territoriales (ex: Dalle du Refus à La Louvière).
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-sand-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-brand-800 text-white flex items-center justify-center font-black text-xl shadow">
+                        QP
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900 leading-tight">ATD Quart Monde</h1>
+                        <p class="text-xs text-brand-800 font-medium">Belgique & International | Agir Tous pour la Dignité</p>
+                    </div>
+                </div>
+                <div class="hidden lg:flex space-x-1 text-sm font-medium">
+                    <button onclick="switchTab('tab-overview')" id="btn-tab-overview" class="tab-btn px-3 py-2 rounded-t-lg transition active">Origines & Vision</button>
+                    <button onclick="switchTab('tab-structure')" id="btn-tab-structure" class="tab-btn px-3 py-2 rounded-t-lg transition">Gouvernance Belge</button>
+                    <button onclick="switchTab('tab-knowledge')" id="btn-tab-knowledge" class="tab-btn px-3 py-2 rounded-t-lg transition">Croisement des Savoirs</button>
+                    <button onclick="switchTab('tab-upqm')" id="btn-tab-upqm" class="tab-btn px-3 py-2 rounded-t-lg transition">UPQM & Jeunesse</button>
+                    <button onclick="switchTab('tab-territory')" id="btn-tab-territory" class="tab-btn px-3 py-2 rounded-t-lg transition">Ancrage Territorial</button>
+                    <button onclick="switchTab('tab-advocacy')" id="btn-tab-advocacy" class="tab-btn px-3 py-2 rounded-t-lg transition">Plaidoyer & Droit</button>
+                    <button onclick="switchTab('tab-engage')" id="btn-tab-engage" class="tab-btn px-3 py-2 rounded-t-lg transition bg-brand-800 text-white hover:bg-brand-900 border-none">S'engager</button>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="lg:hidden">
+                    <select onchange="switchTab(this.value)" class="bg-sand-100 border border-sand-200 text-slate-800 text-sm rounded-lg p-2 font-medium focus:ring-brand-600">
+                        <option value="tab-overview">1. Origines & Vision</option>
+                        <option value="tab-structure">2. Gouvernance Belge</option>
+                        <option value="tab-knowledge">3. Croisement des Savoirs</option>
+                        <option value="tab-upqm">4. UPQM & Jeunesse</option>
+                        <option value="tab-territory">5. Ancrage Territorial</option>
+                        <option value="tab-advocacy">6. Plaidoyer & Droit</option>
+                        <option value="tab-engage">7. S'engager</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- STATS HERO BAR -->
+        <section class="bg-white rounded-2xl shadow-sm border border-sand-200 p-6 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="p-3 bg-sand-50 rounded-xl border border-sand-100">
+                    <span class="block text-2xl md:text-3xl font-extrabold text-brand-800">1956</span>
+                    <span class="text-xs text-slate-600 font-medium">Fondation à Noisy-le-Grand</span>
+                </div>
+                <div class="p-3 bg-sand-50 rounded-xl border border-sand-100">
+                    <span class="block text-2xl md:text-3xl font-extrabold text-tealbrand-700">1994</span>
+                    <span class="text-xs text-slate-600 font-medium">Rapport Général sur la Pauvreté (BE)</span>
+                </div>
+                <div class="p-3 bg-sand-50 rounded-xl border border-sand-100">
+                    <span class="block text-2xl md:text-3xl font-extrabold text-brand-800">5 Entités</span>
+                    <span class="text-xs text-slate-600 font-medium">ASBL & Fondation en Belgique</span>
+                </div>
+                <div class="p-3 bg-sand-50 rounded-xl border border-sand-100">
+                    <span class="block text-2xl md:text-3xl font-extrabold text-tealbrand-700">2026</span>
+                    <span class="text-xs text-slate-600 font-medium">Recours Conseil d'État & Analyse Arizona</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: ORIGINES ET VISION -->
+        <section id="tab-overview" class="tab-content block space-y-8">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-200">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 border-b border-sand-200 pb-3">
+                    1. Fondements Anthropologiques et Rupture Paradigmatique
+                </h2>
+                <p class="text-slate-700 leading-relaxed mb-6 text-base md:text-lg">
+                    Cette section retrace l'origine historique et la rupture philosophique portée par Joseph Wresinski. L'extrême pauvreté n'y est pas analysée comme un simple manque de ressources économiques, mais comme une violation systémique des droits humains et une exclusion sociétale marquée par le mépris institutionnalisé. Vous découvrirez la distinction fondamentale entre pauvreté et misère, ainsi que les jalons marquants de 1956 à 2026.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-amber-50/50 p-6 rounded-xl border border-amber-200">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <span class="px-2.5 py-1 bg-brand-800 text-white rounded text-xs font-bold">Concept Clé</span>
+                            <h3 class="text-xl font-bold text-brand-900">Pauvreté vs Misère</h3>
+                        </div>
+                        <ul class="space-y-3 text-sm text-slate-700">
+                            <li class="flex items-start">
+                                <span class="text-brand-800 mr-2 font-bold">•</span>
+                                <span><strong>Pauvreté matérielle :</strong> Privation économique mesurable, manque de ressources ou de revenus.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-brand-800 mr-2 font-bold">•</span>
+                                <span><strong>La Misère :</strong> Négation de l'humanité, oppression multidimensionnelle, invisibilité sociale et mépris institutionnalisé. Vouloir la dignité et se la voir refuser par la société.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-brand-800 mr-2 font-bold">•</span>
+                                <span><strong>Posture éthique :</strong> Les personnes vivant dans l'extrême pauvreté ne sont pas des bénéficiaires passifs mais les premiers experts de leur propre condition.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-teal-50/50 p-6 rounded-xl border border-teal-200">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <span class="px-2.5 py-1 bg-tealbrand-700 text-white rounded text-xs font-bold">3 Piliers d'Engagement</span>
+                            <h3 class="text-xl font-bold text-tealbrand-800">L'Architecture Humaine</h3>
+                        </div>
+                        <div class="space-y-3 text-sm text-slate-700">
+                            <div>
+                                <strong class="text-tealbrand-800">1. Militants Quart Monde :</strong>
+                                <p class="text-xs">Personnes ayant l'expérience directe de la grande pauvreté, s'engageant pour soutenir plus démunis qu'elles.</p>
+                            </div>
+                            <div>
+                                <strong class="text-tealbrand-800">2. Volontaires Permanents :</strong>
+                                <p class="text-xs">Individus faisant le choix de vivre avec une indemnité modeste pour rester proches des pauvres (ex: Alwine de Vos van Steenwijk). ~450 dans le monde.</p>
+                            </div>
+                            <div>
+                                <strong class="text-tealbrand-800">3. Alliés :</strong>
+                                <p class="text-xs">Citoyens, professionnels et universitaires apportant leurs compétences et leur voix au soutien du mouvement.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Chronology Slider/Buttons -->
+                <div class="border-t border-sand-200 pt-6">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4">Chronologie des Jalons Historiques (1956 - 2026)</h3>
+                    <p class="text-xs text-slate-500 mb-4">Cliquez sur un jalon pour afficher le détail historique :</p>
+                    
+                    <div class="flex flex-wrap gap-2 mb-6" id="timeline-buttons">
+                        <!-- JS populated -->
+                    </div>
+
+                    <div id="timeline-detail" class="p-5 bg-sand-100 rounded-xl border border-sand-200 transition-all duration-300">
+                        <!-- JS content -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: STRUCTURE ET GOUVERNANCE BELGE -->
+        <section id="tab-structure" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-200">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 border-b border-sand-200 pb-3">
+                    2. Ancrage, Architecture Organisationnelle et Gouvernance en Belgique
+                </h2>
+                <p class="text-slate-700 leading-relaxed mb-6 text-base md:text-lg">
+                    Cette section présente la structure polycentrique développée par ATD Quart Monde pour s'insérer dans l'architecture fédérale belge. Présent depuis 1969 à Molenbeek et officialisé sous forme d'ASBL en 1971, le mouvement orchestre ses actions à travers 5 entités juridiques distinctes partageant le même siège à la Maison Quart Monde à Etterbeek.
+                </p>
+
+                <!-- Entities Table -->
+                <div class="overflow-x-auto mb-8">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-sand-200 text-slate-800 font-bold border-b border-sand-300">
+                                <th class="p-3">Dénomination Juridique</th>
+                                <th class="p-3">N° d'Entreprise</th>
+                                <th class="p-3">Mandat Statutaire & Agréments Institutionnels</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-sand-200">
+                            <tr class="hover:bg-sand-50">
+                                <td class="p-3 font-semibold text-brand-800">ASBL ATD Quart Monde Belgique</td>
+                                <td class="p-3 font-mono text-xs">408.429.089</td>
+                                <td class="p-3">Structure faîtière nationale créée en 1971. Coordination, plaidoyer politique interfédéral (Service de lutte contre la pauvreté) et éthique globale.</td>
+                            </tr>
+                            <tr class="hover:bg-sand-50">
+                                <td class="p-3 font-semibold text-brand-800">ASBL ATD Quart Monde Wallonie-Bruxelles</td>
+                                <td class="p-3 font-mono text-xs">433.477.657</td>
+                                <td class="p-3">Bras opérationnel francophone. Reconnue et subsidiée comme association d'« Éducation permanente » (Décret 2003 FWB). Orchestre les UPQM.</td>
+                            </tr>
+                            <tr class="hover:bg-sand-50">
+                                <td class="p-3 font-semibold text-brand-800">ASBL ATD Quart Monde Jeunesse WB</td>
+                                <td class="p-3 font-mono text-xs">470.672.605</td>
+                                <td class="p-3">Entité dédiée aux mineurs et jeunes. Reconnue comme « Organisation de Jeunesse » par la FWB. Déploie les Bibliothèques de Rue et projets scolaires.</td>
+                            </tr>
+                            <tr class="hover:bg-sand-50">
+                                <td class="p-3 font-semibold text-brand-800">VZW ATD Vierde Wereld Vlaanderen</td>
+                                <td class="p-3 font-mono text-xs">431.892.933</td>
+                                <td class="p-3">Entité néerlandophone. Reconnue en Flandre sous le statut : <em>« vereniging waar armen het woord nemen »</em> (association où les pauvres prennent la parole).</td>
+                            </tr>
+                            <tr class="hover:bg-sand-50">
+                                <td class="p-3 font-semibold text-brand-800">Fondation ATD Quart Monde Belgique</td>
+                                <td class="p-3 font-mono text-xs">436.525.437</td>
+                                <td class="p-3">Fondation d'utilité publique dédiée à la sécurisation des ressources (donations, legs). Membre de la FFP et agréée Récolte de fonds Éthique (RE-EF).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center border-t border-sand-200 pt-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Transparence Financière & Rigueur</h3>
+                        <p class="text-sm text-slate-700 leading-relaxed mb-4">
+                            L'ensemble des entités obéit à un plan stratégique quinquennal co-décidé par militants, volontaires et alliés. Les finances font l'objet d'un audit indépendant strict. Par exemple, les comptes consolidés contrôlés pour l'exercice clos affichaient un total bilantaire de <strong>2 280 436 €</strong> avec un profit annuel de <strong>95 339 €</strong>, garantissant la viabilité pérenne de la structure sans chercher l'accumulation de capital.
+                        </p>
+                        <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200 text-xs text-emerald-800 font-medium">
+                            ✓ Membre agréé du Code d'Éthique de la Récolte de Fonds (RE-EF)<br>
+                            ✓ Indépendance politique et financière garantie
+                        </div>
+                    </div>
+
+                    <!-- Chart Container for Engagement Distribution -->
+                    <div class="bg-sand-50 p-4 rounded-xl border border-sand-200">
+                        <h4 class="text-sm font-bold text-center text-slate-800 mb-2">Répartition des Piliers Humains du Mouvement</h4>
+                        <div class="chart-container">
+                            <canvas id="chartEngagement"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: CROISEMENT DES SAVOIRS ET DÉMOCRATIE ÉPISTÉMIQUE -->
+        <section id="tab-knowledge" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-200">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 border-b border-sand-200 pb-3">
+                    3. La Rupture Épistémologique : Le Croisement des Savoirs ©
+                </h2>
+                <p class="text-slate-700 leading-relaxed mb-6 text-base md:text-lg">
+                    Cette section traite du cœur méthodologique et théorique d'ATD Quart Monde. Pour contrer ce que la philosophe Miranda Fricker nomme « l'injustice épistémique » (invalidation de la parole des pauvres), ATD Quart Monde a conceptualisé la méthodologie du <em>Croisement des Savoirs et des Pratiques</em>. Explorez ci-dessous comment dialoguent les 3 types de savoirs.
+                </p>
+
+                <!-- Interactive Matrix Simulator -->
+                <div class="bg-sand-50 p-6 rounded-2xl border border-sand-200 mb-8">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 text-center">Simulateur d'Interactions des 3 Savoirs</h3>
+                    <p class="text-xs text-slate-500 text-center mb-6">Cliquez sur un des 3 savoirs pour comprendre sa contribution et le résultat de la co-construction :</p>
+
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <button onclick="selectKnowledge('exp')" id="btn-know-exp" class="p-4 bg-white rounded-xl border-2 border-brand-800 text-left hover:shadow-md transition">
+                            <span class="block text-xs font-bold text-brand-800 uppercase tracking-wider mb-1">1. Savoir Expérientiel</span>
+                            <strong class="block text-slate-900">Militants Quart Monde</strong>
+                            <span class="text-xs text-slate-500">Connaissance directe de la survie et des violences institutionnelles.</span>
+                        </button>
+
+                        <button onclick="selectKnowledge('acad')" id="btn-know-acad" class="p-4 bg-white rounded-xl border-2 border-sand-300 text-left hover:shadow-md transition">
+                            <span class="block text-xs font-bold text-tealbrand-700 uppercase tracking-wider mb-1">2. Savoir Académique</span>
+                            <strong class="block text-slate-900">Universitaires & Chercheurs</strong>
+                            <span class="text-xs text-slate-500">Cadres théoriques, statistiques et analyse systémique.</span>
+                        </button>
+
+                        <button onclick="selectKnowledge('prac')" id="btn-know-prac" class="p-4 bg-white rounded-xl border-2 border-sand-300 text-left hover:shadow-md transition">
+                            <span class="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">3. Savoir Pragmatique</span>
+                            <strong class="block text-slate-900">Professionnels & Acteurs de terrain</strong>
+                            <span class="text-xs text-slate-500">Contraintes institutionnelles et pratiques du travail social.</span>
+                        </button>
+                    </div>
+
+                    <div id="knowledge-display" class="bg-white p-6 rounded-xl border border-sand-200">
+                        <!-- Dynamic Content via JS -->
+                    </div>
+                </div>
+
+                <!-- Case study: UCLouvain & Food Aid -->
+                <div class="bg-amber-50/60 p-6 rounded-xl border border-amber-200">
+                    <h3 class="text-lg font-bold text-amber-900 mb-2">Exemple Majeur en Belgique : Recherche UCLouvain sur l'Aide Alimentaire</h3>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        En appliquant la rigueur du Croisement des Savoirs, une recherche menée conjointement par <strong>UCLouvain</strong>, la <strong>Fédération des Services Sociaux</strong> et <strong>ATD Quart Monde</strong> a déconstruit l'image des colis alimentaires comme simple solidarité logistique. La parole des usagers a mis en lumière la violence symbolique, le sentiment de dégradation, la perte d'autonomie et les files d'attente stigmatisantes, conduisant à repenser radicalement le droit à l'alimentation autonome.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: UPQM ET ACTIONS JEUNESSE -->
+        <section id="tab-upqm" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-200">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 border-b border-sand-200 pb-3">
+                    4. Universités Populaires Quart Monde (UPQM) et Dynamiques Jeunesse
+                </h2>
+                <p class="text-slate-700 leading-relaxed mb-6 text-base md:text-lg">
+                    Cette section met en avant les dispositifs d'émancipation politique et culturelle d'ATD Quart Monde. Reconnues par le décret de l'Éducation Permanente (2003) en Fédération Wallonie-Bruxelles, les UPQM sont des agoras démocratiques où s'élabore la pensée collective. Parallèlement, l'action jeunesse s'exprime à travers les Bibliothèques de Rue et le réseau mondial Tapori.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <!-- UPQM & 2026 Focus -->
+                    <div class="bg-sand-50 p-6 rounded-xl border border-sand-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-xl font-bold text-slate-900">Fonctionnement des UPQM</h3>
+                                <span class="px-2 py-1 bg-brand-800 text-white rounded text-xs font-bold">Éducation Permanente</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                                Les UPQM se préparent en cellules locales à l'aide de lettres d'animation. Les assemblées plénières régulières (Bruxelles, Charleroi, Liège, Sambreville) réunissent militants, universitaires et responsables politiques.
+                            </p>
+                            <div class="bg-white p-4 rounded-lg border border-sand-200 text-xs space-y-2 mb-4">
+                                <strong class="text-brand-800 block text-sm">Focus 2026 : Décryptage de la Coalition « Arizona »</strong>
+                                <p class="text-slate-700">
+                                    En 2026, les UPQM ont consacré leurs travaux à l'analyse prospective des notes du gouvernement fédéral belge (N-VA, MR, Les Engagés, Vooruit, CD&V). Les thèmes clés débattus incluent :
+                                </p>
+                                <ul class="list-disc list-inside text-slate-600 space-y-1">
+                                    <li>La réforme de l'administration de biens</li>
+                                    <li>Le durcissement du statut de cohabitant</li>
+                                    <li>L'accentuation des politiques d'activation des chômeurs</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Youth Actions -->
+                    <div class="bg-teal-50/40 p-6 rounded-xl border border-teal-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-xl font-bold text-tealbrand-800">Action Culturelle & Jeunesse</h3>
+                                <span class="px-2 py-1 bg-tealbrand-700 text-white rounded text-xs font-bold">Jeunesse WB</span>
+                            </div>
+                            
+                            <div class="space-y-4 text-xs text-slate-700">
+                                <div>
+                                    <strong class="text-sm font-bold text-slate-900 block mb-1">1. Bibliothèques de Rue (Bdr)</strong>
+                                    <p class="leading-relaxed">
+                                        Chaque semaine, à heure fixe, sur les trottoirs des quartiers populaires (Molenbeek, Jupille, Sambreville), des équipes posent une bâche et des livres. Inconditionnalité et régularité pour contrer la ségrégation scolaire (décelée par l'OCDE/PISA).
+                                    </p>
+                                </div>
+                                <div>
+                                    <strong class="text-sm font-bold text-slate-900 block mb-1">2. Réseau Tapori (6-12 ans)</strong>
+                                    <p class="leading-relaxed">
+                                        Né en 1965 suite aux rencontres avec les enfants des rues à Bombay. Diffusion bimestrielle de la Lettre Tapori (en 5 langues) et camps de jeunes pour éradiquer la « pauvrophobie » dès l'enfance.
+                                    </p>
+                                </div>
+                                <div>
+                                    <strong class="text-sm font-bold text-slate-900 block mb-1">3. Nos Ambitions pour l'École</strong>
+                                    <p class="leading-relaxed">
+                                        Co-construction parents précarisés - enseignants pour bâtir un système scolaire véritablement inclusif.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: ANCRAGE TERRITORIAL (WALLONIE & BRUXELLES) -->
+        <section id="tab-territory" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-200">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 border-b border-sand-200 pb-3">
+                    5. Cartographie et Ancrage Territorial en Wallonie et à Bruxelles
+                </h2>
+                <p class="text-slate-700 leading-relaxed mb-6 text-base md:text-lg">
+                    ATD Quart Monde puise sa légitimité politique dans son maillage local. Cliquez sur les différentes antennes régionales ci-dessous pour découvrir leurs projets emblématiques (ex: la Dalle du Refus de la Misère à La Louvière, les potagers à Liège, la lutte contre la gentrification à Bruxelles).
+                </p>
+
+                <!-- Hub Selection Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                    <button onclick="showTerritory('louviere')" id="btn-terr-louviere" class="p-3 bg-brand-800 text-white rounded-xl text-center font-bold text-sm shadow transition">La Louvière</button>
+                    <button onclick="showTerritory('charleroi')" id="btn-terr-charleroi" class="p-3 bg-sand-100 text-slate-700 rounded-xl text-center font-bold text-sm hover:bg-sand-200 transition">Charleroi & Hainaut</button>
+                    <button onclick="showTerritory('liege')" id="btn-terr-liege" class="p-3 bg-sand-100 text-slate-700 rounded-xl text-center font-bold text-sm hover:bg-sand-200 transition">Liège</button>
+                    <button onclick="showTerritory('namur')" id="btn-terr-namur" class="p-3 bg-sand-100 text-slate-700 rounded-xl text-center font-bold text-sm hover:bg-sand-200 transition">Namur & Vallées</button>
+                    <button onclick="showTerritory('bruxelles')" id="btn-terr-bruxelles" class="p-3 bg-sand-100 text-slate-700 rounded-xl text-center font-bold text-sm hover:bg-sand-200 transition">Bruxelles Métropole</button>
+                </div>
+
+                <div id="territory-display" class="p-6 bg-sand-50 rounded-2xl border border-sand-200 transition-all duration-300">
+                    <!-- Dynamic JS Content -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: PLAIDOYER ET COMBAT JURIDIQUE -->
+        <section id="tab-advocacy" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-200">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 border-b border-sand-200 pb-3">
+                    6. Plaidoyer Macro-politique, TZCLD et Contentieux Stratégique
+                </h2>
+                <p class="text-slate-700 leading-relaxed mb-6 text-base md:text-lg">
+                    Cette section analyse l'action systémique d'ATD Quart Monde Belgique : la lutte contre le non-recours aux droits (projet BELMOD), le modèle d'emploi innovant TZCLD, et le contentieux juridique stratégique mené en 2026 contre la criminalisation de la mendicité à Bruxelles.
+                </p>
+
+                <!-- Begging Ordonnance 2026 Recourse Banner -->
+                <div class="p-6 bg-rose-900 text-white rounded-2xl mb-8 shadow-md">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <span class="px-2.5 py-1 bg-rose-700 text-white rounded text-xs font-bold uppercase tracking-wider">Action en Justice - 15 Juin 2026</span>
+                            <h3 class="text-xl font-bold mt-2">Recours en Annulation devant le Conseil d'État de Belgique</h3>
+                            <p class="text-xs text-rose-100 mt-1 max-w-3xl leading-relaxed">
+                                Face au règlement municipal « anti-mendicité » réactivé par la Ville de Bruxelles (interdisant la mendicité en présence de mineurs), ATD Quart Monde et ses partenaires ont déposé un recours. L'association refuse la criminalisation de la pauvreté parentale et exige le respect de la dignité. (S'ajoute à la réclamation auprès du CEDS contre la fracture numérique).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Non-Recours Section & Chart -->
+                <div class="grid md:grid-cols-2 gap-8 mb-8 items-center border-b border-sand-200 pb-8">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">La Trilogie des Coûts du Non-Recours (BELMOD)</h3>
+                        <p class="text-xs text-slate-700 leading-relaxed mb-4">
+                            En collaboration avec le Service de lutte contre la pauvreté (dont le rapport 2024-2025 s'intitule <em>L'humain comme boussole dans les services publics</em>), ATD Quart Monde dénonce les conséquences du "New Public Management" et de la dématérialisation forcée.
+                        </p>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 bg-sand-100 rounded border border-sand-200">
+                                <strong class="text-brand-800">1. Coûts d'information :</strong> Dédale administratif, numérisation exclusive, absence de guichets physiques.
+                            </div>
+                            <div class="p-2.5 bg-sand-100 rounded border border-sand-200">
+                                <strong class="text-brand-800">2. Coûts de processus :</strong> Surcharge cognitive (cognitive overload), formulaires complexes, maîtrise d'outils e-gov.
+                            </div>
+                            <div class="p-2.5 bg-sand-100 rounded border border-sand-200">
+                                <strong class="text-brand-800">3. Coûts psychologiques :</strong> Stigmatisation, honte, peur du jugement dans les démarches (CPAS, ONEM).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-sand-50 p-4 rounded-xl border border-sand-200">
+                        <h4 class="text-xs font-bold text-center text-slate-800 mb-2">Poids Relatif des Barrières du Non-Recours</h4>
+                        <div class="chart-container">
+                            <canvas id="chartNonRecours"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TZCLD SIMULATOR -->
+                <div class="bg-teal-50/50 p-6 rounded-2xl border border-teal-200">
+                    <h3 class="text-xl font-bold text-tealbrand-800 mb-2">Territoires Zéro Chômeur de Longue Durée (TZCLD)</h3>
+                    <p class="text-xs text-slate-700 mb-6 leading-relaxed">
+                        Le modèle TZCLD propose la réallocation des dépenses passives (allocations, soins de santé liés à l'inactivité) pour financer des emplois utiles en CDI au salaire minimum dans des <em>Entreprises à But d'Emploi (EBE)</em>. Le Manifeste National Belge de 2024 exige le déploiement législatif.
+                    </p>
+
+                    <!-- Interactive Slider & Dynamic Chart -->
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="tzcld-slider" class="block text-xs font-bold text-slate-800 mb-1">
+                                    Nombre de personnes réinsérées : <span id="tzcld-count" class="text-brand-800 text-sm font-black">200</span> chômeurs
+                                </label>
+                                <input id="tzcld-slider" type="range" min="50" max="1000" step="50" value="200" oninput="updateTZCLD(this.value)" class="w-full accent-brand-800 h-2 bg-sand-200 rounded-lg cursor-pointer">
+                            </div>
+
+                            <div class="p-4 bg-white rounded-xl border border-teal-200 text-xs space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-600">Dépenses publiques passives économisées :</span>
+                                    <strong id="tzcld-saved" class="text-slate-900">3 000 000 €</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-600">Emplois CDI créés dans la collectivité :</span>
+                                    <strong id="tzcld-jobs" class="text-tealbrand-700">200 CDI</strong>
+                                </div>
+                                <div class="flex justify-between pt-2 border-t border-sand-200">
+                                    <span class="font-bold text-slate-800">Bénéfice sociétal net (santé, activité) :</span>
+                                    <strong id="tzcld-benefit" class="text-brand-800">Inestimable</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-xl border border-teal-200">
+                            <h4 class="text-xs font-bold text-center text-slate-800 mb-1">Transfert Budgétaire Pasif vs Actif (k€)</h4>
+                            <div class="chart-container">
+                                <canvas id="chartTZCLD"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 7: AGIR ET S'ENGAGER -->
+        <section id="tab-engage" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-200">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 border-b border-sand-200 pb-3">
+                    7. Comment Rejoint-on le Mouvement ? Modalités d'Engagement
+                </h2>
+                <p class="text-slate-700 leading-relaxed mb-6 text-base md:text-lg">
+                    ATD Quart Monde ne fonctionne pas comme une ONG classique avec de simples bénévoles d'exécution. Il propose des alliances durables et des fraternités d'action. Explorez ci-dessous le mode d'engagement le plus adapté à votre trajectoire.
+                </p>
+
+                <div class="grid md:grid-cols-4 gap-4 mb-8">
+                    <div class="p-5 bg-sand-50 rounded-xl border border-sand-200 hover:border-brand-800 transition">
+                        <div class="w-8 h-8 rounded-full bg-brand-800 text-white flex items-center justify-center font-bold text-sm mb-3">1</div>
+                        <h3 class="font-bold text-slate-900 mb-1 text-sm">Militant Quart Monde</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Pour toute personne vivant ou ayant vécu l'extrême pauvreté. Prendre la parole, participer aux UPQM et lutter avec ses pairs.
+                        </p>
+                    </div>
+
+                    <div class="p-5 bg-sand-50 rounded-xl border border-sand-200 hover:border-tealbrand-700 transition">
+                        <div class="w-8 h-8 rounded-full bg-tealbrand-700 text-white flex items-center justify-center font-bold text-sm mb-3">2</div>
+                        <h3 class="font-bold text-slate-900 mb-1 text-sm">Allié(e)</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Citoyen, professionnel, chercheur. Apportez vos compétences (animation Bdr, juriste, co-formation) dans votre milieu de vie.
+                        </p>
+                    </div>
+
+                    <div class="p-5 bg-sand-50 rounded-xl border border-sand-200 hover:border-amber-700 transition">
+                        <div class="w-8 h-8 rounded-full bg-amber-700 text-white flex items-center justify-center font-bold text-sm mb-3">3</div>
+                        <h3 class="font-bold text-slate-900 mb-1 text-sm">Volontaire Permanent</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Choix de vie fort : engagement à plein temps, partage du quotidien, indemnité modeste garantie pour vivre simplement.
+                        </p>
+                    </div>
+
+                    <div class="p-5 bg-sand-50 rounded-xl border border-sand-200 hover:border-emerald-700 transition">
+                        <div class="w-8 h-8 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-sm mb-3">4</div>
+                        <h3 class="font-bold text-slate-900 mb-1 text-sm">Donateur / Membre</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Soutien financier structurel via la Fondation ATD Quart Monde Belgique. Attestation fiscale dès 40 €/an.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 text-center max-w-2xl mx-auto">
+                    <h3 class="text-lg font-bold text-brand-900 mb-2">Siège et Coordination Nationale Belgique</h3>
+                    <p class="text-xs text-slate-700 mb-3">
+                        Maison Quart Monde — Avenue Victor Jacobs 12, 1040 Etterbeek (Bruxelles)<br>
+                        Agréments : Éducation Permanente (FWB), Organisation de Jeunesse, RE-EF.
+                    </p>
+                    <div class="inline-block px-4 py-2 bg-brand-800 text-white text-xs font-bold rounded-lg shadow">
+                        Abonnement gratuit aux Lettres UPQM & Tapori disponible
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p class="font-medium text-slate-300">Application d'Information & d'Analyse Interactive — ATD Quart Monde Belgique</p>
+            <p>Conçue à partir du rapport de référence sur la justice épistémique, la co-construction et l'ancrage belge (1956-2026).</p>
+            <p class="text-slate-500">« Là où des hommes sont condamnés à vivre dans la misère, les droits de l'homme sont violés. S'unir pour les faire respecter est un devoir sacré. » — Joseph Wresinski</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Data Logic & Dynamic Rendering -->
+    <script>
+        // Data Storage
+        const timelineData = [
+            { year: '1956', title: 'Camp de Noisy-le-Grand', desc: 'Joseph Wresinski arrive le 14 juillet au camp de sans-logis de Château-de-France (252 familles). Refus de la charité d\'urgence et création d\'ATD.' },
+            { year: '1969', title: 'Arrivée en Belgique', desc: 'Installation du premier volontaire permanent belge, André Modave, à Molenbeek-Saint-Jean (Bruxelles).' },
+            { year: '1971', title: 'Création ASBL Belge', desc: 'Officialisation juridique de l\'ASBL ATD Quart Monde Belgique (23 juin 1971).' },
+            { year: '1987', title: 'Trocadéro & Audience Royale', desc: '100 000 personnes au Trocadéro (17 oct). Wresinski est reçu par le Roi Baudouin en Belgique, amorçant la demande d\'un rapport d\'État.' },
+            { year: '1994', title: 'Rapport Général sur la Pauvreté', desc: 'Publication du RGP en Belgique. Pour la première fois, la parole des pauvres dicte les recommandations politiques nationales.' },
+            { year: '2003', title: 'Décret Éducation Permanente', desc: 'Reconnaissance institutionnelle des Universités Populaires Quart Monde par la Communauté française de Belgique.' },
+            { year: '2012-2016', title: 'Droits de l\'Homme & Pauvrophobie', desc: 'Principes directeurs ONU (2012) et reconnaissance de la précarité sociale comme 21e critère de discrimination (2016).' },
+            { year: '2024', title: 'Manifeste National TZCLD', desc: 'Publication du manifeste pour les Territoires Zéro Chômeur de Longue Durée par la coalition belge.' },
+            { year: '2026', title: 'Conseil d\'État & Coalition Arizona', desc: 'Recours juridique le 15 juin 2026 contre le règlement anti-mendicité à Bruxelles; décryptage des notes de formation gouvernementale en UPQM.' }
+        ];
+
+        const territoryData = {
+            louviere: {
+                title: "La Louvière & le Centre (Hainaut)",
+                desc: "Ancrage historique né en 1987 à la suite de l'appel du Trocadéro. En 2002, le groupe a fait installer une 'Dalle du Refus de la Misère' sur le Boulevard des Droits de l'Homme.",
+                highlights: [
+                    "Rassemblement citoyen majeur chaque 17 octobre autour de la Dalle.",
+                    "Lien étroit avec la mémoire ouvrière et les luttes contre la désindustrialisation.",
+                    "Ateliers de préparation active pour les Universités Populaires."
+                ]
+            },
+            charleroi: {
+                title: "Charleroi & Bassin Hennuyer",
+                desc: "Groupe fondé en 1990 pour mener les enquêtes de terrain du Rapport Général sur la Pauvreté.",
+                highlights: [
+                    "Soutien au Collectif des Morts de la Rue.",
+                    "Groupes de réflexion et d'expression dédiés aux adolescents.",
+                    "Présence active dans le Borinage (Quaregnon) et le Tournaisis."
+                ]
+            },
+            liege: {
+                title: "Liège & Basse-Meuse",
+                desc: "Implantation ancienne combinant préparation politique et projets d'écologie populaire.",
+                highlights: [
+                    "Projet 'Jardin en partage' (potager urbain) : prouvant que l'écologie doit inclure les classes populaires.",
+                    "Bibliothèques de rue récurrentes à Jupille.",
+                    "Participation dynamique aux marches du Housing Action Day."
+                ]
+            },
+            namur: {
+                title: "Namur & Pays des Vallées",
+                desc: "Cellule locale caractérisée par un fort travail de réflexion et de création artistique.",
+                highlights: [
+                    "Co-production du film documentaire 'On fait des choses qu’on n’aurait jamais osé' avec le GSARA.",
+                    "Interventions régulières au centre pour demandeurs d'asile de Natoye."
+                ]
+            },
+            bruxelles: {
+                title: "Région de Bruxelles-Capitale",
+                desc: "Siège national (Maison Quart Monde à Etterbeek) et présence historique dans les quartiers populaires (Molenbeek, Cureghem, Saint-Gilles).",
+                highlights: [
+                    "Lutte contre la gentrification et défense du droit au logement.",
+                    "Dépôt du recours en annulation devant le Conseil d'État (15 juin 2026) contre le règlement anti-mendicité.",
+                    "Bibliothèques de Rue hebdomadaires dans les cités bruxelloises."
+                ]
+            }
+        };
+
+        const knowledgeData = {
+            exp: {
+                title: "1. Savoir Expérientiel (Militants Quart Monde)",
+                content: "Issu de la vie quotidienne face à la grande pauvreté. Ce n'est pas un simple témoignage passif, mais une analyse systémique de la survie, des failles des services publics et du mépris social. Sans ce savoir, les politiques publiques sont vouées à être hors-sol."
+            },
+            acad: {
+                title: "2. Savoir Académique (Universitaires & Chercheurs)",
+                content: "Apporte la rigueur méthodologique, les concepts sociologiques, juridiques et économiques. Dans le Croisement des Savoirs, le chercheur n'est plus un 'extracteur de données' mais un co-chercheur à égalité avec les pauvres."
+            },
+            prac: {
+                title: "3. Savoir Pragmatique (Professionnels & Praticiens)",
+                content: "Issu de la pratique du travail social, de l'enseignement ou de la magistrature. Connaît les règles de gestion, les lois et les limites du terrain institutionnel."
+            }
+        };
+
+        // Tab Switching Handler
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            const target = document.getElementById(tabId);
+            if(target) target.classList.remove('hidden');
+
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            // Lazy Render Charts if switching to tabs containing charts
+            if (tabId === 'tab-structure' && !window.chartEngagementInit) initChartEngagement();
+            if (tabId === 'tab-advocacy' && !window.chartAdvocacyInit) initChartsAdvocacy();
+        }
+
+        // Timeline Builder
+        function buildTimeline() {
+            const btnContainer = document.getElementById('timeline-buttons');
+            timelineData.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1.5 rounded-lg text-xs font-bold transition border ${index === 0 ? 'bg-brand-800 text-white border-brand-800' : 'bg-white text-slate-700 border-sand-300 hover:bg-sand-100'}`;
+                btn.innerText = item.year;
+                btn.onclick = () => {
+                    document.querySelectorAll('#timeline-buttons button').forEach(b => b.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition border bg-white text-slate-700 border-sand-300 hover:bg-sand-100');
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition border bg-brand-800 text-white border-brand-800';
+                    showTimelineDetail(index);
+                };
+                btnContainer.appendChild(btn);
+            });
+            showTimelineDetail(0);
+        }
+
+        function showTimelineDetail(index) {
+            const item = timelineData[index];
+            const detailBox = document.getElementById('timeline-detail');
+            detailBox.innerHTML = `
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="text-xl font-extrabold text-brand-800">${item.year}</span>
+                    <h4 class="text-base font-bold text-slate-900">— ${item.title}</h4>
+                </div>
+                <p class="text-xs text-slate-700 leading-relaxed">${item.desc}</p>
+            `;
+        }
+
+        // Knowledge Display Handler
+        function selectKnowledge(type) {
+            ['exp', 'acad', 'prac'].forEach(t => {
+                const btn = document.getElementById('btn-know-' + t);
+                btn.classList.remove('border-brand-800', 'border-tealbrand-700', 'border-amber-700');
+                btn.classList.add('border-sand-300');
+            });
+
+            const activeBtn = document.getElementById('btn-know-' + type);
+            activeBtn.classList.remove('border-sand-300');
+            if(type==='exp') activeBtn.classList.add('border-brand-800');
+            if(type==='acad') activeBtn.classList.add('border-tealbrand-700');
+            if(type==='prac') activeBtn.classList.add('border-amber-700');
+
+            const item = knowledgeData[type];
+            document.getElementById('knowledge-display').innerHTML = `
+                <h4 class="text-sm font-bold text-slate-900 mb-2">${item.title}</h4>
+                <p class="text-xs text-slate-700 leading-relaxed">${item.content}</p>
+                <div class="mt-4 p-3 bg-sand-50 rounded border border-sand-200 text-xs text-slate-600">
+                    <strong>Règle d'or de la méthodologie :</strong> Travail initial en groupes d'égaux (non-mixité) pour renforcer le pouvoir d'agir, suivi d'une confrontation dialogique à temps de parole strictement égal.
+                </div>
+            `;
+        }
+
+        // Territory Handler
+        function showTerritory(key) {
+            const data = territoryData[key];
+            const display = document.getElementById('territory-display');
+            
+            // update buttons
+            ['louviere', 'charleroi', 'liege', 'namur', 'bruxelles'].forEach(k => {
+                const b = document.getElementById('btn-terr-' + k);
+                if(k === key) {
+                    b.className = "p-3 bg-brand-800 text-white rounded-xl text-center font-bold text-sm shadow transition";
+                } else {
+                    b.className = "p-3 bg-sand-100 text-slate-700 rounded-xl text-center font-bold text-sm hover:bg-sand-200 transition";
+                }
+            });
+
+            display.innerHTML = `
+                <h3 class="text-lg font-bold text-slate-900 mb-2">${data.title}</h3>
+                <p class="text-xs text-slate-700 mb-4 leading-relaxed">${data.desc}</p>
+                <strong class="text-xs font-bold text-brand-800 uppercase tracking-wider block mb-2">Iniciatives & Actions :</strong>
+                <ul class="space-y-2 text-xs text-slate-700">
+                    ${data.highlights.map(h => `<li class="flex items-start"><span class="text-brand-800 mr-2 font-bold">•</span><span>${h}</span></li>`).join('')}
+                </ul>
+            `;
+        }
+
+        // TZCLD Interactive Logic & Chart
+        let chartTZCLDInstance = null;
+        function updateTZCLD(val) {
+            document.getElementById('tzcld-count').innerText = val;
+            const saved = val * 15000; // 15k € per person
+            document.getElementById('tzcld-saved').innerText = saved.toLocaleString('fr-BE') + " €";
+            document.getElementById('tzcld-jobs').innerText = val + " CDI";
+
+            if (chartTZCLDInstance) {
+                chartTZCLDInstance.data.datasets[0].data = [saved / 1000, (val * 18000) / 1000];
+                chartTZCLDInstance.update();
+            }
+        }
+
+        // Chart Initializations
+        function initChartEngagement() {
+            window.chartEngagementInit = true;
+            const ctx = document.getElementById('chartEngagement').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Militants (Pauvreté)', 'Volontaires Permanents', 'Alliés & Citoyens'],
+                    datasets: [{
+                        data: [45, 10, 45],
+                        backgroundColor: ['#9a3412', '#0f766e', '#f59e0b'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function initChartsAdvocacy() {
+            window.chartAdvocacyInit = true;
+            
+            // Chart Non Recours
+            const ctxNR = document.getElementById('chartNonRecours').getContext('2d');
+            new Chart(ctxNR, {
+                type: 'bar',
+                data: {
+                    labels: ['Coûts d\'Information', 'Coûts de Processus', 'Coûts Psychologiques'],
+                    datasets: [{
+                        label: 'Impact de la Barrière (Index 0-100)',
+                        data: [85, 90, 75],
+                        backgroundColor: ['#d97706', '#0d9488', '#9a3412'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { max: 100, ticks: { font: { size: 10 } } } }
+                }
+            });
+
+            // Chart TZCLD
+            const ctxTZ = document.getElementById('chartTZCLD').getContext('2d');
+            chartTZCLDInstance = new Chart(ctxTZ, {
+                type: 'bar',
+                data: {
+                    labels: ['Dépense Passive Pasée', 'Investissement TZCLD Actif'],
+                    datasets: [{
+                        label: 'Montant en k€',
+                        data: [3000, 3600],
+                        backgroundColor: ['#94a3b8', '#0f766e'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { ticks: { font: { size: 10 } } } }
+                }
+            });
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            buildTimeline();
+            selectKnowledge('exp');
+            showTerritory('louviere');
+        });
+    </script>
+</body>
+</html>
